@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import thai from 'dayjs/locale/th'
 import relativeTime  from 'dayjs/plugin/relativeTime'
 import buddhistEra from 'dayjs/plugin/buddhistEra'
+import { NavLink } from 'react-router-dom'
 
 dayjs.locale(thai)
 dayjs.extend(relativeTime)
@@ -40,7 +41,7 @@ const ProductList = () => {
       <div className="flex my-6">
           <h1 className="text-2xl text-black pb-6">Product ({products.length})</h1>
           <p className="flex-1 text-right">
-            <a href="#" className="border-green-500 border-2 rounded-sm px-2 py-1 mb-2 hover:text-white hover:bg-green-500 text-xl">+ เพิ่มรายการ</a>
+            <NavLink to='/reststrapi/addproduct' className="border-green-500 border-2 rounded-sm px-2 py-1 mb-2 hover:text-white hover:bg-green-500 text-xl">+ เพิ่มรายการ</NavLink>
           </p>
       </div>
       

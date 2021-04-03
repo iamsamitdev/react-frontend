@@ -22,6 +22,7 @@ import ReactDataGrid from './pages/reactdatagrid/ReactDataGrid'
 import ReactYoutubeAPI from './pages/reactytapi/ReactYoutubeAPI'
 import ReduxCart from './pages/reduxcart/ReduxCart'
 import Register from './pages/register/Register'
+import AddProduct from './pages/reststrapi/AddProduct'
 import ProductList from './pages/reststrapi/ProductList'
 import Team from './pages/team/Team'
 
@@ -48,7 +49,10 @@ const Routes = () => {
 
             {/* Backend */}
             <AppRoute path="/dashboard" layout={AdminLayout} component={Dashboard} />
-            <AppRoute path="/reststrapi" layout={AdminLayout} component={ProductList} />
+
+            <AppRoute path="/reststrapi" exact={true} layout={AdminLayout} component={ProductList} />
+            <AppRoute path="/reststrapi/addproduct" layout={AdminLayout} component={AddProduct} />
+
             <AppRoute path="/redux" layout={AdminLayout} component={ReduxCart} />
             <AppRoute path="/jwt" layout={AdminLayout} component={Jwt} />
             <AppRoute path="/chartjs" layout={AdminLayout} component={Chartjs} />
