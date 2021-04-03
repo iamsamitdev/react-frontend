@@ -1,16 +1,14 @@
 /* eslint-disable no-undef */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faChevronLeft, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { NavLink } from 'react-router-dom'
+import {useForm} from 'react-hook-form'
+import { baseURLAPI } from '../../constants/configAxios'
 import api from '../../services/productAPI'
 import cogoToast from 'cogo-toast'
 
-import {useForm} from 'react-hook-form'
-
-const AddProduct = () => {
-
-    document.title = 'Add new product'
+const EditProduct = (props) => {
 
     // เรียกใช้ hook สำหรับการอ่านข้อมูลจากฟอร์ม
     const { register, handleSubmit, reset, errors } = useForm()
@@ -18,13 +16,33 @@ const AddProduct = () => {
     // สร้างตัวแปรไว้เก็บ path รูปที่เลือก
     const [imgUrl, setImgUrl] = useState('')
 
+    // อ่านรายการสินค้าชิ้นที่เลือก
+    const [currentProudct, setCurrentProudct] = useState([])
+
+    // สร้างฟังก์ชันอ่านสินค้าจาก API
+    const getProduct = (id) => {
+        api.getProductById(id)
+        .then(response => {
+            setCurrentProudct(response.data)
+            // console.log(response.data)
+        })
+        .catch(e => {
+            console.log(e)
+        })
+    }
+
+    useEffect(() => {
+        getProduct(props.match.params.id)
+    }, [props.match.params.id])
+
+    // ทดสอบเรียกดู currentProudct
+    // console.log(currentProudct)
+
     // สร้างตัวแปรไว้เก็บข้อมูลที่รับใน FormData
     let mydata = {}
 
     // สร้างฟังก์ชัน onSubmit
     const onSubmit = (data) => {
-
-        console.log(data)
 
         mydata.title = data.title
         mydata.slug = data.slug
@@ -46,19 +64,12 @@ const AddProduct = () => {
         // ==========================================================================
         // ส่วนของการบันทึกข้อมูลเข้า API
         // ==========================================================================
-        api.addNewProduct(formData).then(res=>{
+        api.updateProduct(props.match.params.id,formData).then(res =>{
             console.log(res)
 
-            // Reset field
-            reset()
-
-            // Reset Image Field
-            setImgUrl('')
-
             // Show Message 
-            cogoToast.success('เพิ่มข้อมูลเรียบร้อยแล้ว', {position: 'top-center', heading:'สถานะการเพิ่มข้อมูล'})
+            cogoToast.success('แก้ไขข้อมูลเรียบร้อยแล้ว', {position: 'top-center', heading:'สถานะการแก้ไขข้อมูล'})
         })
-
     }
 
     // ฟังก์ชันแสดงรูปตัวอย่างเมื่อเลือก
@@ -73,10 +84,11 @@ const AddProduct = () => {
         }
     }
 
+
     return (
         <>
             <div className="flex my-6">
-                <h1 className="text-2xl text-black pb-6">Add Product</h1>
+                <h1 className="text-2xl text-black pb-6">{currentProudct.title}</h1>
                 <p className="flex-1 text-right">
                     <NavLink to='/reststrapi' className="border-0 px-2 py-1 mb-2 hover:text-blue-600 text-xl"> <FontAwesomeIcon icon={faChevronLeft} /> Back</NavLink>
                 </p>
@@ -93,6 +105,7 @@ const AddProduct = () => {
                                    <dt className="text-sm font-medium text-gray-500">Title</dt> 
                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                         <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="title" name="title" type="text"
+                                        defaultValue={currentProudct.title}
                                         ref={(e) => {
                                             register(e, {required: true})
                                         }}
@@ -104,7 +117,9 @@ const AddProduct = () => {
                                 <div className="px-4 pt-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                     <dt className="text-sm font-medium text-gray-500">Slug</dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                        <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="slug" name="slug" type="text" ref={(e) => {
+                                        <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="slug" name="slug" type="text"
+                                        defaultValue={currentProudct.slug}
+                                        ref={(e) => {
                                             register(e, {required: true})
                                         }}
                                         />
@@ -115,14 +130,18 @@ const AddProduct = () => {
                                 <div className="px-4 pt-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                     <dt className="text-sm font-medium text-gray-500">Description</dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                        <textarea className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" rows="6" id="description" name="description" type="text" ref={register()}></textarea>
+                                        <textarea className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" rows="8" id="description" name="description" type="text" 
+                                        defaultValue={currentProudct.description}
+                                        ref={register()}></textarea>
                                     </dd>
                                 </div>
 
                                 <div className="px-4 pt-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                     <dt className="text-sm font-medium text-gray-500">Price</dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                        <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="price" name="price" type="number" ref={(e) => {
+                                        <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="price" name="price" type="number"
+                                        defaultValue={currentProudct.price}
+                                        ref={(e) => {
                                             register(e, {required: true})
                                         }}
                                         />
@@ -133,7 +152,9 @@ const AddProduct = () => {
                                 <div className="px-4 pt-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                     <dt className="text-sm font-medium text-gray-500">Qty</dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                        <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="qty" name="qty" type="number" ref={(e) => {
+                                        <input className="w-full px-2 py-2 text-gray-700 bg-gray-200 rounded" id="qty" name="qty" type="number" 
+                                        defaultValue={currentProudct.qty}
+                                        ref={(e) => {
                                             register(e, {required: true})
                                         }}
                                         />
@@ -145,12 +166,26 @@ const AddProduct = () => {
                                     <dt className="text-sm font-medium text-gray-500">Category</dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                         <select className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" name="category" id="category" ref={register({ required: true })}>
-                                            <option value="">Select Category</option>
-                                            <option value="1">Electronic</option>
-                                            <option value="2">Cloth</option>
-                                            <option value="3">Mum & Kit</option>
+
+                                            {
+                                                currentProudct.category && currentProudct.category.id === 1 ?
+                                                <option value="1" selected>Electronic</option>:
+                                                <option value="1">Electronic</option>
+                                            }
+
+                                            {
+                                                currentProudct.category && currentProudct.category.id === 2 ?
+                                                <option value="2" selected>Cloth</option>:
+                                                <option value="2">Cloth</option>
+                                            }
+
+                                            {
+                                                currentProudct.category && currentProudct.category.id === 3 ?
+                                                <option value="3" selected>Mum & Kid</option>:
+                                                <option value="3">Mum & Kid</option>
+                                            }
+
                                         </select>
-                                        {errors.category && <p className="text-red-500 mt-2">This field is required</p>}
                                     </dd>
                                 </div>
 
@@ -158,12 +193,26 @@ const AddProduct = () => {
                                     <dt className="text-sm font-medium text-gray-500">Create by</dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                         <select className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"  name="users" id="users" ref={register({ required: true })}>
-                                            <option value="">Select User</option>
-                                            <option value="1">iamsamit</option>
-                                            <option value="2">john</option>
-                                            <option value="3">sean</option>
+
+                                            {
+                                                currentProudct.users && currentProudct.users.id === 1 ?
+                                                <option value="1" selected>iamsamit</option>:
+                                                <option value="1">iamsamit</option>
+                                            }
+
+                                            {
+                                                currentProudct.users && currentProudct.users.id === 2 ?
+                                                <option value="2" selected>john</option>:
+                                                <option value="2">john</option>
+                                            }
+
+                                            {
+                                                currentProudct.users && currentProudct.users.id === 3?
+                                                <option value="3" selected>sean</option>:
+                                                <option value="3">sean</option>
+                                            }
+
                                         </select>
-                                        {errors.users && <p className="text-red-500 mt-2">This field is required</p>}
                                     </dd>
                                 </div>
 
@@ -172,13 +221,31 @@ const AddProduct = () => {
                                     &nbsp;
                                     </dt>
                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                        <button type="submit" className="bg-green-500 rounded-md px-4 py-2 my-2 text-white hover:bg-green-600 text-xl">บันทึกข้อมูล</button>&nbsp;
+                                        <button type="submit" className="bg-green-500 rounded-md px-4 py-2 my-2 text-white hover:bg-green-600 text-xl">อัพเดทข้อมูล</button>&nbsp;
                                     </dd>
                                 </div>
 
                             </div>
 
                             <div className="sm:col-span-1">
+                                
+                                <div className="mt-5">
+                                    {
+                                        currentProudct.image ?
+                                        <img 
+                                            className="w-full mx-auto rounded-md" 
+                                            src={baseURLAPI+currentProudct.image.url}
+                                            alt=""
+                                        />
+                                        :
+                                        <img
+                                            className="w-full mx-auto rounded-md"
+                                            src="/assets/images/noimg.jpg"
+                                            alt=""
+                                        />
+                                    }
+                                </div>
+
                                 <div className="mt-5 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
 
                                     <div className="space-y-1 text-center">
@@ -228,10 +295,8 @@ const AddProduct = () => {
                     </form>
                 </div>
             </div>
-
-
         </>
     )
 }
 
-export default AddProduct
+export default EditProduct

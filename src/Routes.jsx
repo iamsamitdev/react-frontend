@@ -23,6 +23,7 @@ import ReactYoutubeAPI from './pages/reactytapi/ReactYoutubeAPI'
 import ReduxCart from './pages/reduxcart/ReduxCart'
 import Register from './pages/register/Register'
 import AddProduct from './pages/reststrapi/AddProduct'
+import EditProduct from './pages/reststrapi/EditProduct'
 import ProductList from './pages/reststrapi/ProductList'
 import Team from './pages/team/Team'
 
@@ -52,6 +53,7 @@ const Routes = () => {
 
             <AppRoute path="/reststrapi" exact={true} layout={AdminLayout} component={ProductList} />
             <AppRoute path="/reststrapi/addproduct" layout={AdminLayout} component={AddProduct} />
+            <AppRoute path="/reststrapi/editproduct/:id" layout={AdminLayout} component={EditProduct} />
 
             <AppRoute path="/redux" layout={AdminLayout} component={ReduxCart} />
             <AppRoute path="/jwt" layout={AdminLayout} component={Jwt} />

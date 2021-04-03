@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import api from '../../services/productAPI'
 import { baseURLAPI } from '../../constants/configAxios'
 import NumberFormat from 'react-number-format'
-
+import Swal from 'sweetalert2'
 import dayjs from 'dayjs'
 import thai from 'dayjs/locale/th'
 import relativeTime  from 'dayjs/plugin/relativeTime'
@@ -32,6 +32,27 @@ const ProductList = () => {
   const readAllProduct = () =>{
     api.getAllProduct().then(res => {
       setProducts(res.data)
+    })
+  }
+
+  // ลบรายการสินค้า
+  const deleteProduct = (id) => {
+    Swal.fire({
+      title: 'ยืนยันลบรายการ ?',
+      confirmButtonText: 'ยืนยันลบเลย',
+      confirmButtonColor: 'red',
+      showCancelButton: true,
+      cancelButtonText: 'ปิดหน้านี้'
+    }).then((result) => {
+      if(result.isConfirmed){
+        // alert('ลบแล้ว')
+        api.deleteProduct(id).then(res => {
+          console.log(res)
+          Swal.fire('ลบเรียบร้อยแล้ว','','success')
+          // อ่านข้อมูล product ใหม่
+          readAllProduct()
+        })
+      }
     })
   }
 
@@ -147,8 +168,10 @@ const ProductList = () => {
 
                     <td className="px-5 py-5 border-b text-sm text-right">
                       <p className="text-gray-900 whitespace-no-wrap">
-                        <a href="#edit" className="border-yellow-500 border-2 rounded-sm px-3 py-1 hover:text-white hover:bg-yellow-500">แก้ไข</a> &nbsp;
-                        <a href="#delete" className="border-red-500 border-2 rounded-sm px-3 py-1 hover:text-white hover:bg-red-500">ลบออก</a>
+                        <NavLink to={`/reststrapi/editproduct/${product.id}`} className="border-yellow-500 border-2 rounded-sm px-3 py-1 hover:text-white hover:bg-yellow-500">แก้ไข</NavLink> &nbsp;
+                        <button 
+                        className="border-red-500 border-2 rounded-sm px-3 py-1 hover:text-white hover:bg-red-500"
+                        onClick={()=>deleteProduct(product.id)}>ลบออก</button>
                       </p>
                     </td>
 
