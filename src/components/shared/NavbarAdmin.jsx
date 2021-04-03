@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/alt-text */
 import {useState, useRef} from 'react';
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTachometerAlt, faDatabase, faChartPie, faMap, faImage, faTable, faRocket, faInbox, faLock, faShoppingCart, faKey, faVideo, faFilePdf, faBars, faTimes, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"
 import useOutsideClick from "./useOutsideClick";
@@ -17,10 +17,9 @@ const NavbarAdmin = () => {
   });
 
   // Logout และ Clear storage
-  let history = useHistory();
   const logOut = () => {
     localStorage.removeItem('token')
-    history.push('/login')
+    window.location = '/login'
   }
 
   return (
